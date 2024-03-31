@@ -1,22 +1,18 @@
 <?php
 include "db_conn.php";
 
-
 if(isset($_GET['email'])) {
     $email = $_GET['email'];
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $verification_code = $_POST['verification_code'];
 
-        
         $check_verification_sql = "SELECT * FROM user WHERE Email='$email' AND verification_code='$verification_code'";
         $check_verification_result = mysqli_query($conn, $check_verification_sql);
 
         if (mysqli_num_rows($check_verification_result) > 0) {
-            
             $update_status_sql = "UPDATE user SET Status='active' WHERE Email='$email'";
             if (mysqli_query($conn, $update_status_sql)) {
-                
                 header("Location: Loginform.php");
                 exit();
             } else {
@@ -30,40 +26,50 @@ if(isset($_GET['email'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verification</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="Stylesheet.css">
-    <style>
-        .container {
-            max-width: 600px;
-            margin-top: 50px;
-        }
-
-        .btn-black {
-            background-color: black;
-            color: white;
-            border: none;
-        }
-
-        .btn.btn-black:focus,
-        .btn.btn-black.focus {
-            box-shadow: none !important;
-            outline: none !important;
-        }
-    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
 </head>
-<body>
-    <form action="verify.php?email=<?php echo $email; ?>" method="post">
-        <div class="container">
-            <h2>Verification</h2>
-            <div class="form-group">
-                <label for="verification_code">Verification Code</label>
-                <input type="text" name="verification_code" id="verification_code" class="form-control" placeholder="Verification Code" required>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+   
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Verification</h3>
+                        </div>
+                        
+                        <form role="form" action="verify.php?email=<?php echo $email; ?>" method="post">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="verification_code">Verification Code</label>
+                                    <input type="text" class="form-control" id="verification_code" name="verification_code" placeholder="Enter verification code" required>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Verify</button>
+                            </div>
+                        </form>
+                    </div>
+                  
+                </div>
+               
             </div>
-            <button type="submit" class="btn btn-primary btn-black">Verify</button>
+           
         </div>
-    </form>
+    </section>
+   
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
 </body>
 </html>
