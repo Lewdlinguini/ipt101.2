@@ -1,0 +1,11 @@
+CREATE TABLE `user` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    Lastname VARCHAR(255) NOT NULL,
+    First_name VARCHAR(255) NOT NULL,
+    Middle_name VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) NOT NULL
+);
+
+INSERT INTO users (user_name, password) VALUES ('john_doe', 'password123');
