@@ -2,8 +2,9 @@
 session_start();
 include "db_conn.php";
 
-if(isset($_POST['uname']) && isset($_POST['password'])) {
-    function validate($data){
+if (isset($_POST['uname']) && isset($_POST['password'])) {
+    function validate($data)
+    {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
@@ -13,28 +14,33 @@ if(isset($_POST['uname']) && isset($_POST['password'])) {
     $uname = validate($_POST['uname']);
     $pass = validate($_POST['password']);
 
-    if(empty($uname)) {
+    if (empty($uname)) {
         header("Location: Loginform.php?error=User Name is required");
         exit();
-    } elseif (empty($pass)){
+    } elseif (empty($pass)) {
         header("Location: Loginform.php?error=Password is required");
         exit();
     } else {
-        
+
         $sql = "SELECT * FROM user WHERE username=? AND password=?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $uname, $pass);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if($result->num_rows === 1) {
-            $_SESSION['authenticated'] = true;
+        if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
-            $_SESSION['user_name'] = $row['username'];
-            $_SESSION['name'] = $row['First_name'];
-            $_SESSION['id'] = $row['id'];
-            header("Location: home.php");
-            exit();
+            if ($row['Status'] == 'active') {
+                $_SESSION['authenticated'] = true;
+                $_SESSION['user_name'] = $row['username'];
+                $_SESSION['name'] = $row['First_name'];
+                $_SESSION['id'] = $row['id'];
+                header("Location: home.php");
+                exit();
+            } else {
+                header("Location: Loginform.php?error=Account not verified yet");
+                exit();
+            }
         } else {
             header("Location: Loginform.php?error=Incorrect User name or password");
             exit();
