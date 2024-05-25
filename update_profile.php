@@ -6,32 +6,41 @@ if (!isset($_SESSION['authenticated'])) {
     exit();
 }
 
-$user_name = '';
-$user_email = '';
-$user_phone_number = '';
-$user_address = '';
-$success_message = '';
-$error_message = '';
-
 include 'db_conn.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql = "UPDATE user_profile SET full_name=?, email=?, phone_number=?, address=? WHERE user_id=?";
+    $sql = "UPDATE user_profile SET full_name=?, email=?, phone_number=?, address=?, photo=? WHERE user_id=?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssi", $full_name, $email, $phone_number, $address, $user_id);
+    $stmt->bind_param("sssssi", $full_name, $email, $phone_number, $address, $photo, $user_id);
 
     $full_name = $_POST['user_name'] ?? '';
     $email = $_POST['email'] ?? '';
     $phone_number = $_POST['phone_number'] ?? '';
     $address = $_POST['address'] ?? '';
     $user_id = $_SESSION['user_id'];
+    $photo = $_SESSION['photo']; // Default photo if not updated
+
+    // Handling file upload
+    if (isset($_FILES['user_photo']) && $_FILES['user_photo']['error'] == UPLOAD_ERR_OK) {
+        $photo_name = $_FILES['user_photo']['name'];
+        $photo_tmp_name = $_FILES['user_photo']['tmp_name'];
+        $photo_folder = 'uploads/' . $photo_name;
+
+        if (move_uploaded_file($photo_tmp_name, $photo_folder)) {
+            $photo = $photo_name;
+            $_SESSION['photo'] = $photo_name; // Update session photo
+        } else {
+            $error_message = "Error uploading photo.";
+        }
+    }
 
     if ($stmt->execute()) {
         $_SESSION['user_name'] = $full_name;
         $_SESSION['email'] = $email;
         $_SESSION['phone_number'] = $phone_number;
         $_SESSION['address'] = $address;
-        $success_message = "Profile updated successfully.";
+        header("Location: home.php");
+        exit();
     } else {
         $error_message = "Error updating profile: " . $conn->error;
     }
@@ -43,7 +52,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 $user_phone_number = isset($_SESSION['phone_number']) ? $_SESSION['phone_number'] : '';
 $user_address = isset($_SESSION['address']) ? $_SESSION['address'] : '';
-$user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : '';
+$user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png';
 ?>
 
 <!DOCTYPE html>
@@ -83,11 +92,6 @@ $user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : '';
                                     <h3 class="card-title">Profile</h3>
                                 </div>
                                 <div class="card-body">
-                                    <?php if (!empty($success_message)) : ?>
-                                        <div class="alert alert-success" role="alert">
-                                            <?php echo $success_message; ?>
-                                        </div>
-                                    <?php endif; ?>
                                     <?php if (!empty($error_message)) : ?>
                                         <div class="alert alert-danger" role="alert">
                                             <?php echo $error_message; ?>

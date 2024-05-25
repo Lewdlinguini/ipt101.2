@@ -10,7 +10,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 $user_phone_number = isset($_SESSION['phone_number']) ? $_SESSION['phone_number'] : '';
 $user_address = isset($_SESSION['address']) ? $_SESSION['address'] : '';
-$user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : '';
+$user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png'; // Default photo if none is uploaded
 ?>
 
 <!DOCTYPE html>
@@ -88,10 +88,10 @@ $user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : '';
                                             <img src="uploads/<?php echo htmlspecialchars($user_photo); ?>" alt="User Photo" style="max-width: 100%; height: auto;">
                                         </div>
                                         <div class="col-md-9">
-                                            <p><strong>Name:</strong> <?php echo $user_name; ?></p>
-                                            <p><strong>Email:</strong> <?php echo $user_email; ?></p>
-                                            <p><strong>Phone Number:</strong> <?php echo $user_phone_number; ?></p>
-                                            <p><strong>Address:</strong> <?php echo $user_address; ?></p>
+                                            <p><strong>Name:</strong> <?php echo htmlspecialchars($user_name); ?></p>
+                                            <p><strong>Email:</strong> <?php echo htmlspecialchars($user_email); ?></p>
+                                            <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($user_phone_number); ?></p>
+                                            <p><strong>Address:</strong> <?php echo htmlspecialchars($user_address); ?></p>
                                         </div>
                                     </div>
                                 </div>
