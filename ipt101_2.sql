@@ -1,132 +1,103 @@
-<?php
-session_start();
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 26, 2024 at 09:39 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
-if (!isset($_SESSION['authenticated'])) {
-    header("Location: Loginform.php");
-    exit();
-}
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
-include 'db_conn.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql = "UPDATE user_profile SET full_name=?, email=?, phone_number=?, address=?, photo=? WHERE user_id=?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssi", $full_name, $email, $phone_number, $address, $photo, $user_id);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
-    $full_name = $_POST['user_name'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $phone_number = $_POST['phone_number'] ?? '';
-    $address = $_POST['address'] ?? '';
-    $user_id = $_SESSION['user_id'];
-    $photo = $_SESSION['photo']; // Default photo if not updated
+--
+-- Database: `ipt101.2`
+--
 
-    // Handling file upload
-    if (isset($_FILES['user_photo']) && $_FILES['user_photo']['error'] == UPLOAD_ERR_OK) {
-        $photo_name = $_FILES['user_photo']['name'];
-        $photo_tmp_name = $_FILES['user_photo']['tmp_name'];
-        $photo_folder = 'uploads/' . $photo_name;
+-- --------------------------------------------------------
 
-        if (move_uploaded_file($photo_tmp_name, $photo_folder)) {
-            $photo = $photo_name;
-            $_SESSION['photo'] = $photo_name; // Update session photo
-        } else {
-            $error_message = "Error uploading photo.";
-        }
-    }
+--
+-- Table structure for table `user`
+--
 
-    if ($stmt->execute()) {
-        $_SESSION['user_name'] = $full_name;
-        $_SESSION['email'] = $email;
-        $_SESSION['phone_number'] = $phone_number;
-        $_SESSION['address'] = $address;
-        header("Location: home.php");
-        exit();
-    } else {
-        $error_message = "Error updating profile: " . $conn->error;
-    }
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `Lastname` varchar(255) NOT NULL,
+  `First_name` varchar(255) NOT NULL,
+  `Middle_name` varchar(255) NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `verification_code` varchar(32) DEFAULT NULL,
+  `Status` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-    $stmt->close();
-}
+--
+-- Dumping data for table `user`
+--
 
-$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
-$user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
-$user_phone_number = isset($_SESSION['phone_number']) ? $_SESSION['phone_number'] : '';
-$user_address = isset($_SESSION['address']) ? $_SESSION['address'] : '';
-$user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png';
-?>
+INSERT INTO `user` (`id`, `username`, `password`, `Lastname`, `First_name`, `Middle_name`, `Email`, `verification_code`, `Status`) VALUES
+(13, 'Ambatukam', '123', 'Kashimo', 'Gusion', 'P', 'wazzy42069@gmail.com', '00775', 'active');
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Profile</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
-</head>
-<body>
-    <div class="wrapper">
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="home.php"><i class="fas fa-home"></i> Home</a>
-                </li>
-            </ul>
-        </nav>
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">Update Profile</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card card-primary">
-                                <div class="card-header">
-                                    <h3 class="card-title">Profile</h3>
-                                </div>
-                                <div class="card-body">
-                                    <form action="" method="post" enctype="multipart/form-data">
-                                        <div class="form-group">
-                                            <label for="user_photo">Photo:</label>
-                                            <input type="file" id="user_photo" name="user_photo" class="form-control-file">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="user_name">Name:</label>
-                                            <input type="text" id="user_name" name="user_name" class="form-control" value="<?php echo htmlspecialchars($user_name); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email:</label>
-                                            <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user_email); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="phone_number">Phone Number:</label>
-                                            <input type="text" id="phone_number" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user_phone_number); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="address">Address:</label>
-                                            <textarea id="address" name="address" class="form-control"><?php echo htmlspecialchars($user_address); ?></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <aside class="control-sidebar control-sidebar-dark">
-        </aside>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
-</body>
-</html>
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_profile`
+--
+
+CREATE TABLE `user_profile` (
+  `user_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `photo` blob DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user_profile`
+--
+ALTER TABLE `user_profile`
+  ADD PRIMARY KEY (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `user_profile`
+--
+ALTER TABLE `user_profile`
+  ADD CONSTRAINT `user_profile_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

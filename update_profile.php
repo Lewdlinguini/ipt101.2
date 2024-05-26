@@ -92,11 +92,6 @@ $user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png';
                                     <h3 class="card-title">Profile</h3>
                                 </div>
                                 <div class="card-body">
-                                    <?php if (!empty($error_message)) : ?>
-                                        <div class="alert alert-danger" role="alert">
-                                            <?php echo $error_message; ?>
-                                        </div>
-                                    <?php endif; ?>
                                     <form action="" method="post" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label for="user_photo">Photo:</label>
