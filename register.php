@@ -10,30 +10,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $middlename = $_POST['middlename'];
     $email = $_POST['email'];
 
-    $check_email_sql = "SELECT * FROM user WHERE Email='$email'";
-    $check_email_result = mysqli_query($conn, $check_email_sql);
+    // Check if email is already registered
+    $check_email_sql = "SELECT * FROM user WHERE Email=?";
+    $stmt = $conn->prepare($check_email_sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $check_email_result = $stmt->get_result();
 
-    if (mysqli_num_rows($check_email_result) > 0) {
+    if ($check_email_result->num_rows > 0) {
         echo '<p class="error-message-duplicate">Email already registered.</p>';
     } else {
-        
-        $verification_code = substr(md5(uniqid(mt_rand(), true)), 0, 5);
+        // Check if username is already taken
+        $check_username_sql = "SELECT * FROM user WHERE username=?";
+        $stmt = $conn->prepare($check_username_sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $check_username_result = $stmt->get_result();
 
-        if (sendVerificationCode($email, $verification_code)) {
-           
-            $sql = "INSERT INTO user (username, password, Lastname, First_name, Middle_name, Email, verification_code, Status) 
-                    VALUES ('$username', '$password', '$lastname', '$firstname', '$middlename', '$email', '$verification_code', 'inactive')";
-            if (mysqli_query($conn, $sql)) {
-                
-                header("Location: verify.php?email=$email");
-                exit();
-            } else {
-                echo '<p class="error">Registration failed.</p>';
-            }
+        if ($check_username_result->num_rows > 0) {
+            echo '<p class="error-message-duplicate">Username already taken. Please choose another one.</p>';
         } else {
-            echo '<p class="error">Email sending failed.</p>';
+            $verification_code = substr(md5(uniqid(mt_rand(), true)), 0, 5);
+
+            if (sendVerificationCode($email, $verification_code)) {
+                // Use prepared statement to insert new user
+                $sql = "INSERT INTO user (username, password, Lastname, First_name, Middle_name, Email, verification_code, Status) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'inactive')";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssssss", $username, $password, $lastname, $firstname, $middlename, $email, $verification_code);
+                
+                if ($stmt->execute()) {
+                    header("Location: verify.php?email=$email");
+                    exit();
+                } else {
+                    echo '<p class="error">Registration failed.</p>';
+                }
+            } else {
+                echo '<p class="error">Email sending failed.</p>';
+            }
         }
     }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
@@ -43,12 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
-    
     <section class="content">
         <div class="container-fluid">
             <div class="row">
@@ -57,7 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="card-header">
                             <h3 class="card-title">Registration</h3>
                         </div>
-                       
                         <form role="form" action="register.php" method="post">
                             <div class="card-body">
                                 <div class="form-group">
@@ -85,23 +101,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
                                 </div>
                             </div>
-                           
-
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary">Register</button>
                             </div>
                         </form>
                     </div>
-                    
                 </div>
-               
             </div>
-            
         </div>
     </section>
-    
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
 </body>
 </html>
