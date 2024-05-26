@@ -3,8 +3,7 @@ session_start();
 include "db_conn.php";
 
 if (isset($_POST['uname']) && isset($_POST['password'])) {
-    function validate($data)
-    {
+    function validate($data) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
@@ -21,7 +20,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
         header("Location: Loginform.php?error=Password is required");
         exit();
     } else {
-
+        // Check if the user exists and is verified
         $sql = "SELECT * FROM user WHERE username=? AND password=?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $uname, $pass);
@@ -30,7 +29,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
 
         if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
-            if ($row['Status'] == 'active') {
+            if ($row['Status'] === 'active') {
                 $_SESSION['authenticated'] = true;
                 $_SESSION['user_name'] = $row['username'];
                 $_SESSION['name'] = $row['First_name'];
@@ -38,7 +37,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
                 header("Location: home.php");
                 exit();
             } else {
-                header("Location: Loginform.php?error=Account not verified yet");
+                header("Location: Loginform.php?error=Please verify your email before logging in");
                 exit();
             }
         } else {
