@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['email'] = $email;
         $_SESSION['phone_number'] = $phone_number;
         $_SESSION['address'] = $address;
-        header("Location: home.php");
+        header("Location: update_profile.php");
         exit();
     } else {
         $error_message = "Error updating profile: " . $conn->error;
@@ -69,8 +69,14 @@ $user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png';
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="home.php"><i class="fas fa-home"></i> Home</a>
+                    <a class="nav-link" href="index.php"><i class="fas fa-home"></i> Home</a>
                 </li>
+                <li class="nav-item d-none d-sm-inline-block">
+        <a href="update_profile.php" class="nav-link">Edit Profile</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="logout.php" class="nav-link">Logout</a>
+      </li>
             </ul>
         </nav>
         <div class="content-wrapper">
@@ -88,33 +94,40 @@ $user_photo = isset($_SESSION['photo']) ? $_SESSION['photo'] : 'default.png';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card card-primary">
-                                <div class="card-header">
-                                    <h3 class="card-title">Profile</h3>
-                                </div>
-                                <div class="card-body">
-                                    <form action="" method="post" enctype="multipart/form-data">
-                                        <div class="form-group">
-                                            <label for="user_photo">Photo:</label>
-                                            <input type="file" id="user_photo" name="user_photo" class="form-control-file">
+                             <div class="card-header" style="background-color: #343a40;">
+                              <h3 class="card-title" style="color: #ffffff;">Profile</h3>
+                            </div>
+                                <div class="card-body d-flex">
+                                    <div style="flex: 1;">
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label for="user_photo">Photo:</label>
+                                                <input type="file" id="user_photo" name="user_photo" class="form-control-file">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="user_name">Name:</label>
+                                                <input type="text" id="user_name" name="user_name" class="form-control" value="<?php echo htmlspecialchars($user_name); ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">Email:</label>
+                                                <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user_email); ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="phone_number">Phone Number:</label>
+                                                <input type="text" id="phone_number" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user_phone_number); ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="address">Address:</label>
+                                                <textarea id="address" name="address" class="form-control"><?php echo htmlspecialchars($user_address); ?></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary" style="background-color: #343a40; border-color: #343a40;">Update Profile</button>
+                                        </form>
+                                    </div>
+                                    <div style="flex: 0 0 150px; margin-left: 20px;">
+                                        <div style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                                            <img src="uploads/<?php echo htmlspecialchars($user_photo); ?>" alt="User Photo" style="width: 100%; height: auto;">
                                         </div>
-                                        <div class="form-group">
-                                            <label for="user_name">Name:</label>
-                                            <input type="text" id="user_name" name="user_name" class="form-control" value="<?php echo htmlspecialchars($user_name); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email:</label>
-                                            <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user_email); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="phone_number">Phone Number:</label>
-                                            <input type="text" id="phone_number" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user_phone_number); ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="address">Address:</label>
-                                            <textarea id="address" name="address" class="form-control"><?php echo htmlspecialchars($user_address); ?></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2024 at 07:15 AM
+-- Generation Time: May 26, 2024 at 09:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,6 +38,13 @@ CREATE TABLE `user` (
   `verification_code` varchar(32) DEFAULT NULL,
   `Status` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `username`, `password`, `Lastname`, `First_name`, `Middle_name`, `Email`, `verification_code`, `Status`) VALUES
+(13, 'Ambatukam', '123', 'Kashimo', 'Gusion', 'P', 'wazzy42069@gmail.com', '00775', 'active');
 
 -- --------------------------------------------------------
 
@@ -78,7 +85,7 @@ ALTER TABLE `user_profile`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
